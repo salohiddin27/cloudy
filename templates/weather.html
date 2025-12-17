@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌤️ Interactive Weather App</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+/* ================= GENERAL ================= */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    overflow:hidden;
+    transition: background 1s ease;
+    background-size:cover;
+    background-position:center;
+    position:relative;
+    color:white;
+    /* UNIVERSAL BACKGROUND */
+    background-image:url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80');
+}
+h1{
+    font-size:3rem;
+    margin:30px 0 10px;
+    color:#ff4081;
+    text-shadow:1px 1px 15px rgba(0,0,0,0.5);
+    text-align:center;
+}
+.search-form{
+    display:flex;
+    width:90%;
+    max-width:600px;
+    margin-bottom:20px;
+    border-radius:50px;
+    overflow:hidden;
+    box-shadow:0 4px 25px rgba(0,0,0,0.3);
+}
+.search-form input{
+    flex:1;
+    padding:15px 20px;
+    font-size:1rem;
+    border:none;
+    outline:none;
+}
+.search-form button{
+    padding:0 25px;
+    border:none;
+    background:linear-gradient(45deg,#ff4081,#ff80ab);
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    transition:all 0.3s ease;
+}
+.search-form button:hover{transform:scale(1.05);}
+.weather-card{
+    position:relative;
+    width:90%;
+    max-width:500px;
+    background:rgba(0,0,0,0.6);
+    border-radius:25px;
+    padding:40px 30px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.35);
+    text-align:center;
+    overflow:hidden;
+    backdrop-filter:blur(10px);
+}
+.city-name{font-size:2rem;font-weight:700;color:#ffd700;margin-bottom:10px;}
+.temperature{font-size:5rem;font-weight:800;color:#ff5722;margin:20px 0;}
+.condition{font-size:1.5rem;color:#00ffff;margin-bottom:20px;}
+.info{font-size:1.1rem;margin:6px 0;}
+.weather-icon{width:100px;height:100px;margin-bottom:15px;}
+@media(max-width:768px){.temperature{font-size:3.5rem;}.city-name{font-size:1.8rem;}.condition{font-size:1.2rem;}.info{font-size:1rem;}.weather-icon{width:70px;height:70px;}}
+
+/* ================= WEATHER EFFECTS ================= */
+.rain-drop{position:absolute;width:2px;height:15px;background:rgba(255,255,255,0.7);opacity:0.3;animation:drop linear infinite;}
+@keyframes drop{0%{transform:translateY(0) scaleY(1);}50%{transform:translateY(20px) scaleY(1.2);}100%{transform:translateY(40px) scaleY(1);}}
+.snow-drop{position:absolute;width:5px;height:5px;background:white;border-radius:50%;opacity:0.8;animation:snow linear infinite;}
+@keyframes snow{0%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(30px) rotate(180deg);}100%{transform:translateY(60px) rotate(360deg);}}
+.cloud{position:absolute;background:rgba(255,255,255,0.8);border-radius:50%;animation:cloudMove linear infinite;cursor:pointer;transition:left 2s ease;}
+.cloud::before,.cloud::after{content:'';position:absolute;background:rgba(255,255,255,0.8);border-radius:50%;}
+.cloud:hover{left:calc(100% - 50px) !important;}
+@keyframes cloudMove{0%{left:-200px;}100%{left:100%;}}
+.sun{position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fff200,#ffb400);top:50px;right:50px;animation:sunMove 10s ease-in-out infinite alternate;}
+@keyframes sunMove{0%{transform:translateY(0);}50%{transform:translateY(20px);}100%{transform:translateY(0);}}
+.lightning{position:absolute;width:4px;height:60px;background:yellow;opacity:0;animation:flash 1.2s infinite;}
+@keyframes flash{0%,90%,100%{opacity:0;}91%,95%{opacity:1;}}
+.fog{position:absolute;width:200%;height:200%;background:radial-gradient(circle, rgba(255,255,255,0.05) 20%, transparent 80%);top:-50%;left:-50%;animation:fogMove 60s linear infinite;}
+@keyframes fogMove{0%{transform:translate(0,0);}100%{transform:translate(50px,20px);}}
+#rain-container,#cloud-container,#snow-container,#lightning-container,#fog-container,#flower-container,#star-container,#bird-container{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;}
+
+/* ================= DECORATIVE ANIMATIONS ================= */
+.flower{position:absolute;width:25px;height:25px;background:radial-gradient(circle at 50% 50%,#ff69b4,#ff1493);border-radius:50%;opacity:0.7;animation:floatFlowers linear infinite;}
+@keyframes floatFlowers{0%{transform:translateY(0) translateX(0) rotate(0deg);}50%{transform:translateY(-150px) translateX(40px) rotate(180deg);}100%{transform:translateY(0) translateX(0) rotate(360deg);}}
+.star{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:0.8;animation:twinkle linear infinite;}
+@keyframes twinkle{0%,100%{opacity:0.3;transform:scale(1);}50%{opacity:1;transform:scale(1.5);}}
+.bird{position:absolute;width:30px;height:20px;background:url('https://cdn-icons-png.flaticon.com/512/616/616408.png') no-repeat center/contain;animation:flyBird linear infinite;}
+@keyframes flyBird{0%{left:-50px;transform:rotate(0deg);}50%{left:50%;transform:rotate(5deg);}100%{left:100%;transform:rotate(0deg);}}
+.night{background:black;background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);color:white;}
+</style>
+</head>
+<body class="{% if weather %}{% with cond=weather.condition|lower %}{% if 'sun' in cond or 'clear' in cond %}sunny{% elif 'cloud' in cond or 'overcast' in cond or 'partly cloudy' in cond %}cloudy{% elif 'rain' in cond or 'drizzle' in cond %}rainy{% elif 'snow' in cond or 'sleet' in cond %}snowy{% elif 'storm' in cond or 'thunder' in cond or 'thunderstorm' in cond %}stormy{% elif 'mist' in cond or 'fog' in cond %}foggy{% else %}sunny{% endif %}{% endwith %}{% else %}sunny{% endif %}">
+
+<h1>🌤️ Interactive Weather App</h1>
+<form method="get" action="{% url 'get_weather' %}" class="search-form">
+<input type="text" name="q" placeholder="Shahar nomini kiriting" required>
+<button type="submit">Qidirish</button>
+</form>
+
+{% if weather %}
+<div class="weather-card">
+{% if 'sun' in weather.condition|lower or 'clear' in weather.condition|lower %}
+<div class="sun"></div>
+<img src="https://cdn-icons-png.flaticon.com/512/1163/1163661.png" class="weather-icon" alt="Sunny">
+{% elif 'cloud' in weather.condition|lower or 'overcast' in weather.condition|lower or 'partly cloudy' in weather.condition|lower %}
+<img src="https://cdn-icons-png.flaticon.com/512/1163/1163624.png" class="weather-icon" alt="Cloudy">
+{% elif 'rain' in weather.condition|lower or 'drizzle' in weather.condition|lower %}
+<img src="https://cdn-icons-png.flaticon.com/512/1163/1163620.png" class="weather-icon" alt="Rainy">
+{% elif 'snow' in weather.condition|lower or 'sleet' in weather.condition|lower %}
+<img src="https://cdn-icons-png.flaticon.com/512/642/642102.png" class="weather-icon" alt="Snowy">
+{% elif 'storm' in weather.condition|lower or 'thunder' in weather.condition|lower or 'thunderstorm' in weather.condition|lower %}
+<img src="https://cdn-icons-png.flaticon.com/512/414/414974.png" class="weather-icon" alt="Stormy">
+{% elif 'mist' in weather.condition|lower or 'fog' in weather.condition|lower %}
+<img src="https://cdn-icons-png.flaticon.com/512/4005/4005901.png" class="weather-icon" alt="Foggy">
+{% else %}
+<img src="https://cdn-icons-png.flaticon.com/512/1163/1163644.png" class="weather-icon" alt="Weather">
+{% endif %}
+<div class="city-name">{{ weather.city }}</div>
+<div class="temperature">{{ weather.temperature }}°C</div>
+<div class="condition">{{ weather.condition }}</div>
+<div class="info">💨 Shamol: {{ weather.wind_speed }} kph</div>
+<div class="info">💧 Namlik: {{ weather.humidity }}%</div>
+<div class="info text-muted">🕒 Yangilangan: {{ weather.created_at }}</div>
+</div>
+{% elif error %}
+<p class="text-center text-danger fw-bold mt-4">{{ error }}</p>
+{% endif %}
+
+<div id="rain-container"></div>
+<div id="cloud-container"></div>
+<div id="snow-container"></div>
+<div id="lightning-container"></div>
+<div id="fog-container"></div>
+<div id="flower-container"></div>
+<div id="star-container"></div>
+<div id="bird-container"></div>
+
+<script>
+setTimeout(()=>{ location.reload(); },60000);
+const rainContainer=document.getElementById('rain-container');
+const cloudContainer=document.getElementById('cloud-container');
+const snowContainer=document.getElementById('snow-container');
+const lightningContainer=document.getElementById('lightning-container');
+const fogContainer=document.getElementById('fog-container');
+const flowerContainer=document.getElementById('flower-container');
+const starContainer=document.getElementById('star-container');
+const birdContainer=document.getElementById('bird-container');
+
+/* WEATHER FUNCTIONS */
+function createRain(count=120){for(let i=0;i<count;i++){let d=document.createElement('div');d.classList.add('rain-drop');d.style.left=Math.random()*100+'%';d.style.top=Math.random()*-200+'px';d.style.animationDuration=(0.5+Math.random()*0.7)+'s';rainContainer.appendChild(d);}}
+function createCloud(count=8){for(let i=0;i<count;i++){let c=document.createElement('div');c.classList.add('cloud');c.style.width=(80+Math.random()*100)+'px';c.style.height=(40+Math.random()*50)+'px';c.style.top=(Math.random()*50)+'px';c.style.animationDuration=(30+Math.random()*30)+'s';cloudContainer.appendChild(c);}}
+function createSnow(count=80){for(let i=0;i<count;i++){let s=document.createElement('div');s.classList.add('snow-drop');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*-200+'px';s.style.animationDuration=(3+Math.random()*3)+'s';snowContainer.appendChild(s);}}
+function createLightning(count=2){for(let i=0;i<count;i++){let l=document.createElement('div');l.classList.add('lightning');l.style.left=(10+Math.random()*80)+'%';l.style.top=(20+Math.random()*50)+'px';l.style.animationDelay=(Math.random()*5)+'s';lightningContainer.appendChild(l);}}
+function createFog(){let f=document.createElement('div');f.classList.add('fog');fogContainer.appendChild(f);}
+function createFlowers(count=15){for(let i=0;i<count;i++){let f=document.createElement('div');f.classList.add('flower');f.style.left=Math.random()*100+'%';f.style.top=Math.random()*100+'%';f.style.animationDuration=(5+Math.random()*5)+'s';f.style.width=f.style.height=(20+Math.random()*20)+'px';flowerContainer.appendChild(f);}}
+function createStars(count=50){for(let i=0;i<count;i++){let s=document.createElement('div');s.classList.add('star');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDuration=(1+Math.random()*2)+'s';starContainer.appendChild(s);}}
+function createBirds(count=3){for(let i=0;i<count;i++){let b=document.createElement('div');b.classList.add('bird');b.style.top=Math.random()*50+'%';b.style.animationDuration=(10+Math.random()*10)+'s';birdContainer.appendChild(b);}}
+
+/* APPLY WEATHER (UNIVERSAL BACKGROUND) */
+const body=document.body;
+const cond=body.className;
+switch(cond){
+    case 'sunny':
+        createFlowers(25);
+        createBirds(2);
+        break;
+    case 'cloudy':
+        createCloud(12);
+        createFlowers(15);
+        break;
+    case 'rainy':
+        createRain(200);
+        createCloud(8);
+        createLightning(4);
+        break;
+    case 'snowy':
+        createSnow(150);
+        createCloud(6);
+        createFlowers(10);
+        break;
+    case 'stormy':
+        createRain(250);
+        createLightning(8);
+        createCloud(10);
+        createFog();
+        break;
+    case 'foggy':
+        createFog();
+        createStars(40);
+        break;
+    default:
+        /* default animatsiya */
+        createFlowers(10);
+}
+</script>
+</body>
+</html>
