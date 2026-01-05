@@ -7,9 +7,8 @@ def get_weather(request):
     try:
         weather_data = fetch_weather(city)
     except Exception as e:
-        return render(request,  {"error": str(e)})
-        # The code works only if you specify weather.html after template_name.
-    return render(request,  {'weather': weather_data})
+        return render(request, 'weather.html', {"error": str(e)})
+    return render(request, 'weather.html', {'weather': weather_data})
 
 def custom_404_view(request, exception=None):
     return HttpResponseNotFound(
