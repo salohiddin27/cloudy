@@ -1,13 +1,16 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("S_K")
 
-DEBUG = os.getenv("DEBUG")
-load_dotenv()
-ALLOWED_HOSTS =os.getenv("ALLOWED_HOSTS").split(",")
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 
 INSTALLED_APPS = [
@@ -57,7 +60,7 @@ WSGI_APPLICATION = 'root.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
+        'NAME': os.getenv('POSTGRES_DB',),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
