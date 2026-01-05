@@ -8,7 +8,7 @@ def get_weather(request):
         weather_data = fetch_weather(city)
     except Exception as e:
         return render(request, 'weather.html', {"error": str(e)})
-
+        # The code works after adding it to the weather.html template.
     return render(request, 'weather.html', {'weather': weather_data})
 
 def custom_404_view(request, exception=None):
