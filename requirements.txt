@@ -1,0 +1,16 @@
+attrs==25.3.0
+autocommand==2.2.2
+babel==2.17.0
+bcrypt==4.2.0
+blinker==1.9.0
+certifi==2025.1.31
+chardet==5.2.0
+click==8.1.8
+Django>=4.2
+djangorestframework
+psycopg2-binary
+python-dotenv
+gunicorn
+django-redis>=6.0.0
+requests>=2.31.0
+psycopg[binary]
