@@ -12,5 +12,5 @@ def get_weather(request):
 
 def custom_404_view(request, exception=None):
     return HttpResponseNotFound(
-        'Resource not found. You must write /login or /weather', status=404
+        'Resource not found. You must write /login or /weather',status=404
     )
